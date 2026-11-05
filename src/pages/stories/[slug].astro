@@ -1,0 +1,55 @@
+---
+import GlossGroup from "../../components/GlossGroup.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getStories } from "../../lib/stories";
+
+export async function getStaticPaths() {
+  const stories = await getStories();
+  return stories.map(({ slug, story }) => ({
+    params: { slug },
+    props: { story },
+  }));
+}
+
+const { story } = Astro.props;
+---
+
+<BaseLayout title={`${story.title} | Spanish Reading`} description={`Read ${story.title}, a ${story.cefr} Spanish story.`}>
+  <article class="reader">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a href="/">All stories</a>
+      <span aria-hidden="true">/</span>
+      <span>{story.cefr} story</span>
+    </nav>
+
+    <header class="reader-header">
+      <span class="level-badge">{story.cefr}</span>
+      <h1>{story.title}</h1>
+      <p>Select a phrase to swap between Spanish and English.</p>
+    </header>
+
+    <div class="reader-card">
+      <p class="story-text" lang="es">
+        {story.groups.map((group, index) => (
+          <>
+            {index > 0 && " "}
+            <GlossGroup spanish={group.spanish} english={group.english} index={index} />
+          </>
+        ))}
+      </p>
+    </div>
+
+    <a class="back-link" href="/">← Back to all stories</a>
+  </article>
+
+  <script>
+    document.querySelectorAll<HTMLButtonElement>(".gloss-group").forEach((group) => {
+      group.addEventListener("click", () => {
+        const showEnglish = group.getAttribute("aria-pressed") !== "true";
+        group.setAttribute("aria-pressed", String(showEnglish));
+        group.textContent = showEnglish ? group.dataset.english ?? "" : group.dataset.spanish ?? "";
+        group.lang = showEnglish ? "en" : "es";
+      });
+    });
+  </script>
+</BaseLayout>

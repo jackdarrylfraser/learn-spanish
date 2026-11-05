@@ -1,0 +1,21 @@
+---
+interface Props {
+  spanish: string;
+  english: string;
+  index: number;
+}
+
+const { spanish, english, index } = Astro.props;
+---
+
+<button
+  class="gloss-group"
+  type="button"
+  data-spanish={spanish}
+  data-english={english}
+  data-gloss-index={index}
+  aria-pressed="false"
+  aria-label={`${spanish}: toggle English translation`}
+>
+  {spanish}
+</button>

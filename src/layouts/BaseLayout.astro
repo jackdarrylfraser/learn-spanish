@@ -1,0 +1,34 @@
+---
+import "../styles/global.css";
+import "../styles/reader.scss";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "Read Spanish stories and learn as you go." } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#f8f6f1" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/">Lee y aprende</a>
+      <span class="header-note">Spanish, one story at a time</span>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <p>Read at your own pace. Tap a Spanish group to see its meaning.</p>
+    </footer>
+  </body>
+</html>
