@@ -6,36 +6,22 @@ const stories = await getStories();
 ---
 
 <BaseLayout title="Spanish Reading">
-  <section class="hero">
-    <p class="eyebrow">A little Spanish every day</p>
-    <h1>Read a story.<br /><span>Find your words.</span></h1>
-    <p class="hero-copy">
-      Explore short Spanish stories written for your level. Select any phrase to reveal what it means.
-    </p>
-  </section>
-
-  <section class="story-section" aria-labelledby="stories-heading">
-    <div class="section-heading">
-      <div>
-        <p class="eyebrow">The library</p>
-        <h2 id="stories-heading">Choose a story</h2>
-      </div>
-      <span class="story-count">{stories.length} {stories.length === 1 ? "story" : "stories"}</span>
-    </div>
+  <section class="story-index" id="stories" aria-labelledby="stories-heading">
+    <header class="index-header">
+      <h1 id="stories-heading">Recent Stories</h1>
+      <p>{stories.length} {stories.length === 1 ? "story" : "stories"} to read</p>
+    </header>
 
     {stories.length > 0 ? (
       <ul class="story-list">
-        {stories.map(({ slug, story }, index) => (
+        {stories.map(({ slug, story }) => (
           <li>
-            <a class="story-card" href={`/stories/${slug}/`}>
-              <span class="story-number">{String(index + 1).padStart(2, "0")}</span>
-              <span class="story-card-copy">
-                <span class="story-title">{story.title}</span>
-                <span class="story-subtitle">A short Spanish reading</span>
-              </span>
-              <span class="level-badge">{story.cefr}</span>
-              <span class="story-arrow" aria-hidden="true">↗</span>
-            </a>
+            <article class="story-entry">
+              <h2>
+                <a href={`/stories/${slug}/`}>{story.title}</a>
+              </h2>
+              <p>{story.cefr} · Spanish reading</p>
+            </article>
           </li>
         ))}
       </ul>

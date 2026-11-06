@@ -17,18 +17,17 @@ const { story } = Astro.props;
 <BaseLayout title={`${story.title} | Spanish Reading`} description={`Read ${story.title}, a ${story.cefr} Spanish story.`}>
   <article class="reader">
     <nav class="breadcrumbs" aria-label="Breadcrumb">
-      <a href="/">All stories</a>
+      <a href="/#stories">All stories</a>
       <span aria-hidden="true">/</span>
-      <span>{story.cefr} story</span>
+      <span>{story.title}</span>
     </nav>
 
     <header class="reader-header">
-      <span class="level-badge">{story.cefr}</span>
       <h1>{story.title}</h1>
-      <p>Select a phrase to swap between Spanish and English.</p>
+      <p>{story.cefr} · Select a phrase to see its English translation.</p>
     </header>
 
-    <div class="reader-card">
+    <section class="reader-content" aria-label="Spanish story">
       <p class="story-text" lang="es">
         {story.groups.map((group, index) => (
           <>
@@ -37,19 +36,70 @@ const { story } = Astro.props;
           </>
         ))}
       </p>
-    </div>
-
-    <a class="back-link" href="/">← Back to all stories</a>
+      <div class="translation-tooltip" id="translation-tooltip" role="status" aria-live="polite" hidden></div>
+    </section>
   </article>
 
   <script>
-    document.querySelectorAll<HTMLButtonElement>(".gloss-group").forEach((group) => {
+    const tooltip = document.querySelector<HTMLDivElement>("#translation-tooltip");
+    const groups = document.querySelectorAll<HTMLButtonElement>(".gloss-group");
+    let activeGroup: HTMLButtonElement | null = null;
+
+    if (!tooltip) {
+      throw new Error("The translation tooltip is missing from the story reader.");
+    }
+
+    const dismissTranslation = () => {
+      if (!activeGroup) return;
+      activeGroup.setAttribute("aria-pressed", "false");
+      activeGroup = null;
+      tooltip.hidden = true;
+      tooltip.classList.remove("is-below");
+    };
+
+    groups.forEach((group) => {
       group.addEventListener("click", () => {
-        const showEnglish = group.getAttribute("aria-pressed") !== "true";
-        group.setAttribute("aria-pressed", String(showEnglish));
-        group.textContent = showEnglish ? group.dataset.english ?? "" : group.dataset.spanish ?? "";
-        group.lang = showEnglish ? "en" : "es";
+        if (activeGroup === group) {
+          dismissTranslation();
+          return;
+        }
+
+        if (activeGroup) activeGroup.setAttribute("aria-pressed", "false");
+
+        const english = group.dataset.english;
+        if (!english) {
+          throw new Error("A story phrase is missing its English translation.");
+        }
+
+        group.setAttribute("aria-pressed", "true");
+        activeGroup = group;
+        tooltip.textContent = english;
+        tooltip.hidden = false;
+
+        const phraseRect = group.getBoundingClientRect();
+        const tooltipRect = tooltip.getBoundingClientRect();
+        const showBelow = phraseRect.top < tooltipRect.height + 16;
+        const centerX = phraseRect.left + phraseRect.width / 2;
+        const minX = tooltipRect.width / 2 + 12;
+        const maxX = window.innerWidth - minX;
+
+        tooltip.style.left = `${Math.max(minX, Math.min(centerX, maxX))}px`;
+        tooltip.style.top = `${showBelow ? phraseRect.bottom + 8 : phraseRect.top - 8}px`;
+        tooltip.classList.toggle("is-below", showBelow);
       });
     });
+
+    document.addEventListener("click", (event) => {
+      if (activeGroup && !activeGroup.contains(event.target as Node)) {
+        dismissTranslation();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") dismissTranslation();
+    });
+
+    window.addEventListener("scroll", dismissTranslation, { passive: true });
+    window.addEventListener("resize", dismissTranslation);
   </script>
 </BaseLayout>

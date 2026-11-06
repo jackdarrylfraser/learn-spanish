@@ -1,6 +1,6 @@
 # Learn Spanish
 
-A static Spanish reading site built with Astro. Stories are JSON files with Spanish/English gloss groups. The site inserts one space between groups; select a group in a story to reveal its meaning.
+A static Spanish reading site built with Astro. Stories are JSON files with Spanish/English gloss groups. The site inserts one space between groups; select a group in a story to reveal its meaning without changing the story text layout.
 
 ## Requirements
 

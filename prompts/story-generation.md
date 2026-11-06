@@ -20,7 +20,7 @@ Use exactly this structure:
 
 Requirements:
 
-- Set `cefr` to the requested level.
+- Use the CEFR from above to the requested level.
 - Include every Spanish word in an ordered group. Each `spanish` value must contain no more than four words.
 - Group words or short phrases in a useful way for understanding. Keep idioms together when they fit the four-word limit and translate their meaning in context.
 - Include punctuation in the appropriate Spanish and English strings.
