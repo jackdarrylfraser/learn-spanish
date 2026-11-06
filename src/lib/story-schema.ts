@@ -7,10 +7,18 @@ export interface StoryGroup {
   english: string;
 }
 
+export interface AudioMetadata {
+  url: string;
+  duration: number;
+  narrator: string;
+  generatedAt: string;
+}
+
 export interface Story {
   title: string;
   cefr: CefrLevel;
   groups: StoryGroup[];
+  audio?: AudioMetadata;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -20,9 +28,12 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 function assertExactKeys(
   value: Record<string, unknown>,
   expectedKeys: readonly string[],
+  optionalKeys: readonly string[],
   context: string,
 ): void {
-  const unexpected = Object.keys(value).filter((key) => !expectedKeys.includes(key));
+  const unexpected = Object.keys(value).filter(
+    (key) => !expectedKeys.includes(key) && !optionalKeys.includes(key),
+  );
   const missing = expectedKeys.filter((key) => !(key in value));
 
   if (unexpected.length > 0) {
@@ -53,7 +64,7 @@ export function validateStory(value: unknown, source = "story"): Story {
     throw new Error(`${source}: expected a JSON object`);
   }
 
-  assertExactKeys(value, ["title", "cefr", "groups"], source);
+  assertExactKeys(value, ["title", "cefr", "groups"], ["audio"], source);
   assertNonEmptyString(value.title, `${source}.title`);
 
   if (typeof value.cefr !== "string" || !isCefrLevel(value.cefr)) {
@@ -71,7 +82,7 @@ export function validateStory(value: unknown, source = "story"): Story {
       throw new Error(`${context} must be an object`);
     }
 
-    assertExactKeys(candidate, ["spanish", "english"], context);
+    assertExactKeys(candidate, ["spanish", "english"], [], context);
     assertNonEmptyString(candidate.spanish, `${context}.spanish`);
     assertNonEmptyString(candidate.english, `${context}.english`);
 
@@ -86,10 +97,34 @@ export function validateStory(value: unknown, source = "story"): Story {
     };
   });
 
+  let audio: AudioMetadata | undefined;
+  if (value.audio !== undefined) {
+    if (!isRecord(value.audio)) {
+      throw new Error(`${source}.audio must be an object`);
+    }
+
+    assertExactKeys(value.audio, ["url", "duration", "narrator", "generatedAt"], [], `${source}.audio`);
+    assertNonEmptyString(value.audio.url, `${source}.audio.url`);
+    assertNonEmptyString(value.audio.narrator, `${source}.audio.narrator`);
+    assertNonEmptyString(value.audio.generatedAt, `${source}.audio.generatedAt`);
+
+    if (typeof value.audio.duration !== "number" || value.audio.duration <= 0) {
+      throw new Error(`${source}.audio.duration must be a positive number`);
+    }
+
+    audio = {
+      url: value.audio.url,
+      duration: value.audio.duration,
+      narrator: value.audio.narrator,
+      generatedAt: value.audio.generatedAt,
+    };
+  }
+
   return {
     title: value.title,
     cefr: value.cefr,
     groups,
+    audio,
   };
 }
 

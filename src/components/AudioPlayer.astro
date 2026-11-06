@@ -1,0 +1,70 @@
+---
+import type { AudioMetadata } from "../lib/story-schema";
+
+interface Props {
+  audio: AudioMetadata;
+  storyTitle: string;
+}
+
+const { audio, storyTitle } = Astro.props;
+
+const minutes = Math.floor(audio.duration / 60);
+const seconds = audio.duration % 60;
+const durationText = `${minutes}m ${seconds}s`;
+---
+
+<div class="audio-player">
+  <audio
+    controls
+    class="audio-controls"
+    aria-label={`Play audio for ${storyTitle}`}
+  >
+    <source src={audio.url} type="audio/mpeg" />
+    Your browser does not support the audio element.
+  </audio>
+
+  <div class="audio-info">
+    <span class="speaker-icon" aria-hidden="true">🔊</span>
+    <span class="audio-meta">
+      Spanish narration
+      <span class="duration">({durationText})</span>
+    </span>
+  </div>
+</div>
+
+<style>
+  .audio-player {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .audio-controls {
+    width: 100%;
+    margin-bottom: 0.5rem;
+    border-radius: 4px;
+  }
+
+  .audio-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: white;
+  }
+
+  .speaker-icon {
+    font-size: 1.25rem;
+  }
+
+  .audio-meta {
+    font-weight: 500;
+  }
+
+  .duration {
+    opacity: 0.8;
+    margin-left: 0.25rem;
+  }
+</style>

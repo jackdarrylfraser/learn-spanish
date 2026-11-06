@@ -380,8 +380,3 @@ learn-spanish/
 - Estimated: ~$1/month
 
 **Total Monthly Cost:** ~$2-3 for 50 stories
-
----
-
-## Alternative: No Audio (Baseline)
-If you decide audio isn't needed, this plan can be archived or revisited later.

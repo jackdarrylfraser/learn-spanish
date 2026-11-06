@@ -4,12 +4,16 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "gen:audio": "bun scripts/generate-audio.ts",
+    "gen:audio:dry": "bun scripts/generate-audio.ts --dry-run",
     "preview": "astro preview",
     "check": "astro check",
     "test": "bun test"
   },
   "dependencies": {
+    "@google-cloud/text-to-speech": "^5.5.0",
     "@tailwindcss/vite": "^4.3.4",
+    "@vercel/blob": "^1.0.1",
     "astro": "^7.4.5",
     "sass": "^1.107.1",
     "tailwindcss": "^4.3.4"
